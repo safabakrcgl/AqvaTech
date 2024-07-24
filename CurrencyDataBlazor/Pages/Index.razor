@@ -1,0 +1,44 @@
+@page "/"
+@using CurrencyDataBlazor.Models
+@using CurrencyDataBlazor.Services
+@inject CurrencyDataService CurrencyDataService
+
+<PageTitle>Currency Data</PageTitle>
+
+<h3>Currency Data</h3>
+
+@if (currencyData == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Value</th>
+            <th>Timestamp</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var data in currencyData)
+        {
+            <tr>
+                <td>@data.Name</td>
+                <td>@data.Value</td>
+                <td>@data.Timestamp</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<CurrencyData> currencyData;
+
+    protected override async Task OnInitializedAsync()
+    {
+        currencyData = await CurrencyDataService.GetCurrencyDataAsync();
+    }
+}
