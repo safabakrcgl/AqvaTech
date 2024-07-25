@@ -7,7 +7,9 @@
 
 <h3>Currency Data</h3>
 
-@if (currencyData == null)
+<input @bind="searchTerm" placeholder="Search..." @oninput="FilterCurrencyData" />
+
+@if (filteredCurrencyData == null)
 {
     <p><em>Loading...</em></p>
 }
@@ -22,7 +24,7 @@ else
         </tr>
         </thead>
         <tbody>
-        @foreach (var data in currencyData)
+        @foreach (var data in filteredCurrencyData)
         {
             <tr>
                 <td>@data.Name</td>
@@ -35,10 +37,29 @@ else
 }
 
 @code {
-    private List<CurrencyData> currencyData;
+    private List<CurrencyData> currencyData = new();
+    private List<CurrencyData> filteredCurrencyData = new();
+    private string searchTerm = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
-        currencyData = await CurrencyDataService.GetCurrencyDataAsync();
+        currencyData = await CurrencyDataService.GetCurrencyDataAsync() ?? new List<CurrencyData>();
+        filteredCurrencyData = currencyData;
+    }
+
+    private void FilterCurrencyData(ChangeEventArgs e)
+    {
+        searchTerm = e.Value?.ToString() ?? string.Empty;
+
+        if (string.IsNullOrEmpty(searchTerm))
+        {
+            filteredCurrencyData = currencyData;
+        }
+        else
+        {
+            filteredCurrencyData = currencyData
+                .Where(data => data.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
     }
 }
